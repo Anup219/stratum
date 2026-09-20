@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stratum — Instant 3D Print Quotes &amp; Precision Fabrication</title>
+  <meta name="description"
+    content="Instant 3D print pricing and slicing engine by Stratum Fabrication at SET Nagaland University. Upload STL models, configure PLA, PETG, ABS, and Bambu AMS multi-color prints, and receive live instant quotes." />
+  <meta name="keywords"
+    content="3D printing, instant 3D print quote, Bambu Lab P1S, slicing engine, SET Nagaland University, PLA, PETG, ABS, AMS multi-color, rapid prototyping, Kohima" />
+  <meta name="author" content="Stratum Fabrication by SET Nagaland University" />
+  <meta name="theme-color" content="#0f1013" />
+  <link rel="canonical" href="https://stratum-set.web.app/" />
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="assets/Black and White Letter S Logo_20260920_110202_0000.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <!-- GSAP & ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <!-- Three.js & Loaders -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <!-- Schema.org JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://stratum-set.web.app/#website",
+        "url": "https://stratum-set.web.app/",
+        "name": "Stratum 3D Print Studio",
+        "description": "Instant 3D print pricing and slicing engine by SET Nagaland University.",
+        "publisher": {
+          "@id": "https://stratum-set.web.app/#organization"
+        }
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://stratum-set.web.app/#organization",
+        "name": "Stratum Fabrication by SET Nagaland University",
+        "url": "https://stratum-set.web.app/",
+        "logo": "https://stratum-set.web.app/assets/Black%20and%20White%20Letter%20S%20Logo_20260920_110202_0000.svg",
+        "description": "Additive manufacturing and rapid prototyping studio at School of Engineering and Technology, Nagaland University.",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Kohima",
+          "addressRegion": "Nagaland",
+          "addressCountry": "IN"
+        }
+      },
+      {
+        "@type": "WebApplication",
+        "@id": "https://stratum-set.web.app/#application",
+        "name": "Stratum 3D Print Calculator & Slicer Engine",
+        "url": "https://stratum-set.web.app/",
+        "applicationCategory": "DesignApplication",
+        "operatingSystem": "All modern browsers",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "INR"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://stratum-set.web.app/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What 3D file formats are supported?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Stratum supports standard STL (binary and ASCII) model files. Uploaded models are rendered in real-time in the browser with full 3D interactive rotation, dimensions, and automated slicing calculations."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the maximum build volume available?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Our flagship Bambu Lab P1S printers feature an active build volume of 256 × 256 × 256 mm. Larger models can be scaled down or segmented into interlocking assemblies."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What materials and colors can I choose?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "We offer standard PLA, tough PETG, heat-resistant ABS, flexible TPU, and precision SLA resin. Our Bambu AMS system also supports 4-slot automatic multi-color prints."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is the pricing calculated?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Pricing is calculated from exact sliced filament consumption, print machine time, support material allowances, and finishing overhead, with volume bulk discounts automatically applied."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <link rel="stylesheet" href="stratum.css">
+</head>
+
+<body>
+
+  <!-- Preloader -->
+  <div id="preloader" class="preloader">
+    <div class="preloader-inner">
+      <div class="preloader-logo">Stratum<span>.</span></div>
+      <div class="preloader-bar">
+        <div id="preloader-bar-fill" class="preloader-bar-fill"></div>
+      </div>
+      <div class="preloader-status">Initializing Systems...</div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- ============================================================
+     CUSTOMER VIEW
+     ============================================================ -->
+  <div id="view-customer">
+
+    <header class="nav">
+      <div class="wrap nav-inner">
+        <div class="logo">
+          <img src="assets/Black and White Letter S Logo_20260920_110202_0000.svg" alt="Stratum Logo"
+            class="brand-logo">
+          <span>Stratum</span><span class="dot">.</span>
+        </div>
+        <nav class="nav-links">
+          <a href="#calculator">Calculator</a>
+          <a href="#materials-strip-section">Materials</a>
+          <a href="#how">How it works</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+        <div class="nav-right">
+          <!-- Logged in state -->
+          <div id="userHeaderStatus" style="display:none; align-items:center; gap:12px; position:relative;">
+            <a id="adminPanelLink" class="admin-link" href="admin.html" style="display:none;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                <rect x="14" y="14" width="7" height="7" rx="1.5" />
+              </svg>
+              Admin Panel
+            </a>
+            <div>
+              <button class="user-badge" id="profileBtn" onclick="openUserDashboard()"
+                style="cursor:pointer; border:1px solid var(--border-color); background:transparent; padding:4px 8px; border-radius:var(--r-sm); display:inline-flex; align-items:center; gap:8px;">
+                <div id="profileAvatar"
+                  style="width:28px; height:28px; border-radius:50%; background:var(--signal); color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; font-family:var(--font-mono); text-transform:uppercase;">
+                  U</div>
+                <span id="userBadgeName" style="font-weight:600; color:var(--text-primary);">User</span>
+              </button>
+            </div>
+          </div>
+          <!-- Guest state -->
+          <div id="guestHeaderActions" style="display:flex; align-items:center; gap:12px;">
+            <a class="admin-link" href="login.html">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              Sign In
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- HERO SECTION -->
+      <section class="hero wrap">
+
+        <h1 class="hero-anim gsap-fade-up">Upload a model.<br>Get a price in seconds.</h1>
+        <p class="hero-anim gsap-fade-up">Drop in your file, set the size and material, and Stratum prices the print
+          live — material, machine time and finishing, broken down to the cent.</p>
+      </section>
+
+      <section class="calculator wrap" id="calculator">
+        <div class="calc-grid">
+
+          <!-- CONFIG PANEL -->
+          <div class="card config-panel gsap-scale-in">
+
+            <div class="field-block">
+              <div class="field-label"><span class="t">01 — Model file</span><span class="h">.stl preferred</span></div>
+              <div class="dropzone" id="dropzone">
+                <div class="icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 16V4M12 4l-4 4M12 4l4 4" />
+                    <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
+                  </svg>
+                </div>
+                <div class="txt">
+                  <strong>Drag a model here, or click to browse</strong>
+                  <span>STL or OBJ format supported</span>
+                </div>
+                <input type="file" id="fileInput" accept=".stl,.obj" style="display:none" />
+              </div>
+              <div class="file-chip" id="fileChip">
+                <div>
+                  <div class="fname" id="fname">—</div>
+                  <div class="fmeta" style="display:flex; align-items:center; gap:8px; margin-top:2px;">
+                    <span class="fsize" id="fsize">—</span>
+                  </div>
+                </div>
+                <button class="icon-btn" onclick="clearFile()" aria-label="Remove file">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div class="detect-badge" id="detectBadge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg>
+                <span id="detectText">Dimensions detected from model</span>
+              </div>
+            </div>
+
+            <div class="field-block">
+              <div class="field-label">
+                <span class="t">02 — Bounding size</span>
+                <span class="h">
+                  <button type="button" id="aspectLockBtn" class="aspect-lock-btn locked"
+                    title="Click to unlock independent axis scaling">
+                    <svg id="aspectLockIcon" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                    <span id="aspectLockLabel">Proportional</span>
+                  </button>
+                </span>
+              </div>
+              <div class="dims-row">
+                <div class="dim-input"><label for="dimX">X — width</label><input type="number" id="dimX" min="1"
+                    max="256" value="80"><span class="unit">mm</span></div>
+                <div class="dim-input"><label for="dimY">Y — depth</label><input type="number" id="dimY" min="1"
+                    max="256" value="60"><span class="unit">mm</span></div>
+                <div class="dim-input"><label for="dimZ">Z — height</label><input type="number" id="dimZ" min="1"
+                    max="256" value="40"><span class="unit">mm</span></div>
+              </div>
+              <div id="aspectRatioWarning" class="aspect-warn-msg" style="display:none;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                  <line x1="12" y1="9" x2="12" y2="13" />
+                  <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+                <span>Non-uniform scaling may distort geometry or thin walls</span>
+              </div>
+            </div>
+
+            <div class="field-block">
+              <div class="field-label">
+                <span class="t">03 — Material &amp; Colors</span>
+                <span class="h" id="matCount">—</span>
+              </div>
+              <div class="chip-grid" id="matChips"></div>
+
+              <!-- Filament Color & Bambu AMS System -->
+              <div class="color-selection-system" id="colorSelectionSystem">
+                <div class="color-mode-nav">
+                  <button type="button" class="color-mode-tab active" id="btnSingleColor"
+                    onclick="setColorMode('single')">
+                    <span class="tab-bullet" id="singleColorBullet"></span>
+                    <span class="tab-title">Single Color</span>
+                  </button>
+                  <button type="button" class="color-mode-tab" id="btnAmsMultiColor" onclick="setColorMode('ams')">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="2" y="6" width="20" height="12" rx="2" />
+                      <line x1="7" y1="6" x2="7" y2="18" />
+                      <line x1="12" y1="6" x2="12" y2="18" />
+                      <line x1="17" y1="6" x2="17" y2="18" />
+                    </svg>
+                    <span class="tab-title">Bambu AMS (Multi-Color)</span>
+                    <span class="ams-surcharge-pill" id="amsSurchargePill">+₹5</span>
+                  </button>
+                </div>
+
+                <!-- Single Color Mode View -->
+                <div class="single-color-panel" id="singleColorPanel">
+                  <div class="panel-subhead">
+                    <span class="panel-sublabel">Primary Spool Color</span>
+                    <span class="selected-color-name" id="selectedColorName">Jade White</span>
+                  </div>
+                  <div class="palette-swatches" id="singlePaletteSwatches"></div>
+                </div>
+
+                <!-- AMS Multi-Color Mode View -->
+                <div class="ams-multi-panel" id="amsMultiPanel" style="display: none;">
+                  <div class="ams-rack-header">
+                    <div class="ams-title-row">
+                      <span class="ams-device-tag">BAMBU AMS 4-SLOT TRAY</span>
+                      <span class="ams-status-pill" id="amsStatusPill">1 / 4 Active</span>
+                    </div>
+                    <div class="ams-rack-hint" id="amsRackHint">
+                      Click a slot to toggle or customize. Purge cycles flush nozzle between color changes.
+                    </div>
+                  </div>
+
+                  <div class="ams-bays-rack" id="amsBaysRack"></div>
+
+                  <!-- Bay Palette Drawer for selected bay -->
+                  <div class="bay-palette-drawer" id="bayPaletteDrawer">
+                    <div class="palette-drawer-head">
+                      <span>Choose color for <strong id="activeBayLabel">Slot A1 (Base)</strong>:</span>
+                      <span class="current-bay-color-text" id="activeBayColorName">Jade White</span>
+                    </div>
+                    <div class="palette-swatches mini" id="amsPaletteSwatches"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="field-block">
+              <div class="field-label"><span class="t">04 — Print quality</span><span class="h">layer height</span>
+              </div>
+              <div class="seg" id="qualSeg"></div>
+            </div>
+
+            <div class="field-block">
+              <div class="field-label"><span class="t">05 — Infill</span><span class="h">internal density</span></div>
+              <div class="infill-row">
+                <input type="range" id="infillRange" min="5" max="100" value="20" step="5"
+                  aria-label="Infill density percentage">
+                <span class="infill-val mono" id="infillVal">20%</span>
+              </div>
+            </div>
+
+            <div class="field-block">
+              <div class="field-label"><span class="t">06 — Quantity</span><span class="h" id="discountNote">bulk
+                  discounts apply</span></div>
+              <div class="qty-stepper">
+                <button onclick="stepQty(-1)" aria-label="Decrease quantity">–</button>
+                <input type="number" id="qtyInput" value="1" min="1" max="200" aria-label="Print quantity">
+                <button onclick="stepQty(1)" aria-label="Increase quantity">+</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- BREAKDOWN & PREVIEW PANEL -->
+          <div class="card preview-panel gsap-scale-in">
+            <div class="field-label"><span class="t">Model view</span><span class="h">Orbit/zoom to inspect</span></div>
+            <div class="plate-wrap">
+
+              <!-- Three.js Viewport Container -->
+              <div class="preview-3d-container" id="preview3dContainer">
+                <div id="canvas3dContainer" style="width:100%; height:100%; position:absolute; inset:0;"></div>
+
+                <!-- Inline Specs Overlay: Only Dimensions and Triangle Count -->
+                <div class="viewer-specs-overlay inline-specs" id="viewerSpecsOverlay">
+                  <div class="v-model-specs-list">
+                    <span id="vModelDims">80.00 x 60.00 x 40.00 mm</span>
+                    <span id="vModelTriangles">12 triangles</span>
+                  </div>
+                </div>
+
+                <!-- Full Viewport Expand Button -->
+                <button type="button" class="btn-fullview" onclick="openFullViewer()" title="Open Full Viewport">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+                  </svg>
+                </button>
+              </div>
+
+            </div>
+
+            <!-- 3Ding Style Bottom Viewer Interaction Hint -->
+            <div class="viewer-interaction-hint">
+              Drag to rotate • Scroll to zoom • Right-click to pan
+            </div>
+
+            <!-- Error Banner -->
+            <div class="slicing-error-banner" id="slicingErrorBanner" style="display:none;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <span id="slicingErrorText">Slicing failed</span>
+            </div>
+
+            <div class="warn-msg" id="warnMsg">
+              <svg class="warn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+              <span>Footprint exceeds Bambu P1S build volume (256×256×256mm) — reduce size or split model.</span>
+            </div>
+
+            <!-- Printability & Slicing Advisory Panel -->
+            <div id="slicingAdvisoryPanel" class="slicing-advisory-panel" style="display:none;"></div>
+
+            <div class="breakdown" style="position:relative;">
+              <!-- Slicing Overlay Spinner -->
+              <div id="slicingOverlay" class="slicing-overlay" style="display:none;">
+                <div class="slicing-spinner"></div>
+                <div class="slicing-text">
+                  <strong>Slicing for Bambu P1S...</strong>
+                  <span>Estimate updates once slicing completes</span>
+                </div>
+              </div>
+
+              <div class="bd-row">
+                <span>Part Filament — <span id="bdMatName">PLA</span> <span id="resinTag" class="resin-pill-tag"
+                    style="display:none;">SLA Photopolymer · Approx</span></span>
+                <span class="v" id="bdMat">₹0.00</span>
+              </div>
+              <div class="bd-row" id="bdSupportRow" style="display:none;">
+                <span>Support Material <span style="color:var(--text-muted); font-size:12px;">(tree supports)</span> —
+                  <span id="bdSupportWeight">0.0g</span> <span class="support-info-icon"
+                    title="Bambu tree supports generated to hold up overhangs. Discarded after print.">ⓘ</span></span>
+                <span class="v" id="bdSupportCost">₹0.00</span>
+              </div>
+              <div class="bd-row" id="bdMultiColorRow" style="display:none;">
+                <span>Multi-Color Purge Surcharge <span style="color:var(--text-muted); font-size:12px;">(AMS nozzle
+                    flush)</span></span>
+                <span class="v" id="bdMultiColorCost">+₹5.00</span>
+              </div>
+              <div class="bd-row" id="bdScrapRow">
+                <span>Purge &amp; Scrap Allowance <span style="color:var(--text-muted); font-size:12px;">(~8% fail
+                    buffer)</span></span>
+                <span class="v" id="bdScrapVal">₹0.00</span>
+              </div>
+              <div class="bd-row" id="bdPrintTimeRow">
+                <span>Estimated Print Time</span>
+                <span class="v" id="bdHours" style="color:var(--text-secondary); font-family:var(--font-mono);">20
+                  mins</span>
+              </div>
+              <div class="bd-row"><span id="bdQtyLabel">× 1 unit</span><span class="v" id="bdUnit">₹0.00</span></div>
+              <div class="bd-row discount" id="bdDiscountRow" style="display:none"><span>Bulk discount</span><span
+                  class="v" id="bdDiscount">−₹0.00</span></div>
+              <div class="bd-total"><span class="t">Total Material Charge</span><span class="v"
+                  id="bdTotal">₹0.00</span></div>
+              <div class="turnaround" id="turnaround">Estimated ready for lab pickup in 1–2 days</div>
+            </div>
+
+            <div class="cta-row">
+              <button class="btn btn-accent" onclick="requestQuote()">Request this print</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- FLOORS MATERIALS STRIP -->
+      <section class="materials-strip wrap" id="materials-strip-section">
+        <div class="strip-head">
+          <h2>Materials on the floor today</h2>
+          <div class="layers-rule"><span></span><span></span><span></span></div>
+        </div>
+        <div class="mat-grid animate-stagger" id="matGrid"></div>
+      </section>
+
+      <!-- HOW IT WORKS SECTION -->
+      <section class="how wrap" id="how">
+        <div class="strip-head" style="margin-bottom:0">
+          <h2>How a print moves through the shop</h2>
+        </div>
+        <div class="how-grid">
+          <div class="how-step">
+            <span class="layer-num">LAYER 01</span>
+            <h3>Upload &amp; configure</h3>
+            <p>Drop your file, confirm the size, and choose material, quality and infill. The quote updates as you type.
+            </p>
+          </div>
+          <div class="how-step">
+            <span class="layer-num">LAYER 02</span>
+            <h3>Slice &amp; print</h3>
+            <p>Once confirmed, your file is sliced and queued on the next available machine matching your material.</p>
+          </div>
+          <div class="how-step">
+            <span class="layer-num">LAYER 03</span>
+            <h3>Finish &amp; ship</h3>
+            <p>Supports are removed, surfaces cleaned, and the part is inspected against your spec before it ships.</p>
+          </div>
+        </div>
+      </section>
+      <!-- FREQUENTLY ASKED QUESTIONS SECTION -->
+      <section class="faq-section wrap" id="faq">
+        <div class="strip-head">
+          <h2>Frequently Asked Questions</h2>
+          <div class="layers-rule"><span></span><span></span><span></span></div>
+        </div>
+        <div class="faq-grid">
+          <details class="faq-item" open>
+            <summary class="faq-question">
+              <span>What 3D file formats are supported?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </summary>
+            <div class="faq-answer">
+              Stratum supports standard <strong>STL</strong> (binary and ASCII) model files. When you drop your file
+              onto the configurator, our in-browser 3D engine renders an interactive preview with bounding dimensions,
+              polygon triangle counts, and accurate volume estimates in real-time.
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>What is the maximum build volume available?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </summary>
+            <div class="faq-answer">
+              Our flagship <strong>Bambu Lab P1S</strong> printers feature an active build volume of <strong>256 × 256 ×
+                256 mm</strong>. If your model exceeds this build envelope, the configurator will alert you immediately
+              so you can scale it proportionally or partition it into interlocking sections.
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>Which materials and colors are available on the floor?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </summary>
+            <div class="faq-answer">
+              We stock <strong>PLA</strong> (prototyping &amp; aesthetics), <strong>PETG</strong> (durability &amp;
+              water resistance), <strong>ABS</strong> (high heat &amp; rigidity), flexible <strong>TPU</strong>, and
+              ultra-high-detail <strong>SLA Photopolymer Resin</strong>. We also support multi-color 3D printing via our
+              4-slot <strong>Bambu AMS</strong> system.
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>How is 3D print pricing calculated?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </summary>
+            <div class="faq-answer">
+              Unlike generic weight-only estimators, Stratum calculates quotes using true slicing metrics: exact part
+              filament mass, tree support material, purge cycle allowance, machine run time, and post-processing. Bulk
+              volume discounts are applied automatically for quantities &gt; 1.
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>Where and when can I collect my finished parts?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </summary>
+            <div class="faq-answer">
+              Prints are fabricated and inspected at the <strong>School of Engineering and Technology (SET), Nagaland
+                University</strong> workshop in Kohima. Standard turnaround is 1–2 business days. You can track your
+              print's live status directly from your Stratum account dashboard.
+            </div>
+          </details>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer wrap">
+      <div class="footer-cols">
+        <div class="footer-brand-col">
+          <a href="stratum.html" class="logo" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+            <img src="assets/Black and White Letter S Logo_20260920_110202_0000.svg" alt="Stratum Logo"
+              class="brand-logo" style="width:24px; height:24px;">
+            <span style="font-family:var(--font-display); font-weight:700; font-size:18px; color:var(--text-primary);">Stratum</span><span style="color:var(--signal); font-weight:700; font-size:18px;">.</span>
+          </a>
+          <p style="font-size:12.5px; color:var(--text-muted); margin-top:10px; line-height:1.6;">
+            SET Campus, Nagaland University<br>Kohima, Nagaland — 797004
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-col-title">Navigation</div>
+          <div class="footer-links-list">
+            <a href="#calculator">Instant Calculator</a>
+            <a href="#materials-strip-section">Floor Materials</a>
+            <a href="#how">How It Works</a>
+            <a href="#faq">FAQ</a>
+            <a href="login.html">Sign In / Dashboard</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-col-title">Workshop &amp; Legal</div>
+          <div class="footer-links-list">
+            <button type="button" class="footer-link-btn" onclick="openTermsModal()">Terms of Fabrication</button>
+            <button type="button" class="footer-link-btn" onclick="openPrivacyModal()">Privacy &amp; File Policy</button>
+            <a href="login.html">Authentication Portal</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 Stratum Fabrication by SET Nagaland University</span>
+        <div class="footer-credits">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" class="credit-icon">
+            <polyline points="16 18 22 12 16 6" />
+            <polyline points="8 6 2 12 8 18" />
+          </svg>
+          <span>Developed by <strong class="dev-name">Anup Chowdhury</strong> in coordination with <img
+              src="assets/logo.png" alt="Coding Club" class="club-logo"> <strong class="dev-club">Coding
+              Club</strong></span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Immersive Full Screen Viewer Modal -->
+  <div id="fullScreenModal" class="fullscreen-viewer-modal">
+    <div id="fullCanvasContainer" class="fullscreen-canvas-container">
+      <!-- Full View Top-Left Specs & Filename Overlay -->
+      <div class="fullview-specs-overlay" id="fullviewSpecsOverlay">
+        <div class="v-model-filename" id="vFullModelFilename">Calibration Model</div>
+        <div class="v-model-specs-list">
+          <span id="vFullModelDims">80.00 x 60.00 x 40.00 mm</span>
+          <span id="vFullModelTriangles">12 triangles</span>
+          <span id="vFullModelVolume">192.00 cm³</span>
+        </div>
+      </div>
+
+      <!-- Full View Top-Right Controls: Grid, Axes, Wireframe, Units, Reset View & Exit -->
+      <div class="fullview-controls-overlay" id="fullviewControlsOverlay">
+        <div class="v-ctrl-group">
+          <span class="v-ctrl-label">View:</span>
+          <button type="button" class="v-ctrl-btn btn-toggle-grid active" id="btnToggleGrid"
+            onclick="toggleViewerGrid()" title="Toggle Build Plate Grid">Grid</button>
+          <button type="button" class="v-ctrl-btn btn-toggle-axes active" id="btnToggleAxes"
+            onclick="toggleViewerAxes()" title="Toggle Coordinate Axes">Axes</button>
+          <button type="button" class="v-ctrl-btn btn-toggle-wireframe" id="btnToggleWireframe"
+            onclick="toggleViewerWireframe()" title="Toggle Wireframe">Wireframe</button>
+        </div>
+        <div class="v-unit-toggle">
+          <button type="button" class="v-unit-btn btn-unit-mm active" id="btnUnitMm"
+            onclick="setViewerUnit('mm')">mm</button>
+          <button type="button" class="v-unit-btn btn-unit-inch" id="btnUnitInch"
+            onclick="setViewerUnit('inch')">inch</button>
+        </div>
+        <button type="button" class="v-reset-btn" onclick="resetViewerCamera()"
+          title="Reset Camera to Default View">Reset View</button>
+        <button type="button" class="v-exit-btn" onclick="closeFullViewer()" title="Exit Full Viewport">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+          <span>Exit Full View</span>
+        </button>
+      </div>
+
+      <!-- Full View Interaction Hint -->
+      <div class="viewer-interaction-hint fullview-hint">
+        Drag to rotate • Scroll to zoom • Right-click to pan
+      </div>
+    </div>
+  </div>
+
+  <!-- User Details Modal (Before placing print quote request) -->
+  <div id="detailsModal" class="fullscreen-viewer-modal"
+    style="display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.6); z-index:2100;">
+    <div class="auth-card"
+      style="width:100%; max-width:450px; margin:20px; padding:32px; background:var(--bg-surface); border-radius:var(--r-lg); box-shadow:var(--shadow-premium);">
+      <h3 style="margin-bottom:8px; font-size:20px;">Contact &amp; Academic Details</h3>
+      <p style="font-size:13px; color:var(--text-secondary); margin-bottom:24px;">Please provide your contact details,
+        department, and address before we submit your quote request.</p>
+
+      <form id="detailsForm" onsubmit="event.preventDefault(); submitQuoteWithDetails();">
+        <div class="field" style="margin-bottom:16px;">
+          <label for="detailsPhone" style="display:block; font-size:12px; font-weight:600; margin-bottom:6px;">Phone
+            Number</label>
+          <input type="tel" id="detailsPhone" placeholder="e.g. +91 98765 43210" required
+            style="width:100%; padding:10px 12px; border:1px solid var(--border-color); border-radius:var(--r-sm); font-size:14px; background:rgba(0,0,0,0.01);">
+        </div>
+        <div class="field" style="margin-bottom:16px;">
+          <label for="detailsDept"
+            style="display:block; font-size:12px; font-weight:600; margin-bottom:6px;">Department</label>
+          <input type="text" id="detailsDept" placeholder="e.g. Mechanical Engineering" required
+            style="width:100%; padding:10px 12px; border:1px solid var(--border-color); border-radius:var(--r-sm); font-size:14px; background:rgba(0,0,0,0.01);">
+        </div>
+        <div class="field" style="margin-bottom:24px;">
+          <label for="detailsAddress"
+            style="display:block; font-size:12px; font-weight:600; margin-bottom:6px;">Address</label>
+          <textarea id="detailsAddress" rows="3" placeholder="Full address..." required
+            style="width:100%; padding:10px 12px; border:1px solid var(--border-color); border-radius:var(--r-sm); font-size:14px; background:rgba(0,0,0,0.01); resize:none; font-family:inherit;"></textarea>
+        </div>
+        <div class="actions" style="display:flex; justify-content:flex-end; gap:12px;">
+          <button type="button" class="btn btn-ghost btn-sm" onclick="closeDetailsModal()">Cancel</button>
+          <button type="submit" class="btn btn-accent btn-sm">Confirm &amp; Place Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- User Account Dashboard Modal -->
+  <div id="userDashboardModal" class="fullscreen-viewer-modal"
+    style="display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.6); z-index:2100;">
+    <div class="card"
+      style="width:100%; max-width:800px; margin:20px; background:var(--bg-surface); border-radius:var(--r-lg); box-shadow:var(--shadow-premium); display:flex; flex-direction:column; max-height:85vh; border:none;">
+      <!-- Modal Header -->
+      <div
+        style="display:flex; justify-content:space-between; align-items:center; padding:24px 32px; border-bottom:1px solid var(--border-color);">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div id="dashboardAvatar"
+            style="width:42px; height:42px; border-radius:50%; background:var(--signal); color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; font-family:var(--font-mono); text-transform:uppercase;">
+            U</div>
+          <div style="text-align:left;">
+            <h3 style="font-size:18px; margin:0;" id="dashboardUserName">User Account</h3>
+            <span style="font-size:12px; color:var(--text-muted);" id="dashboardUserEmail">user@example.com</span>
+          </div>
+        </div>
+        <button class="icon-btn" onclick="closeUserDashboard()" aria-label="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div
+        style="display:flex; background:var(--bg-deep); padding:0 32px; border-bottom:1px solid var(--border-color); gap:24px;">
+        <button class="tab-btn active" id="tabBtnProfile" onclick="switchDashboardTab('profile')"
+          style="background:none; border:none; padding:16px 0; font-size:14px; font-weight:600; color:var(--text-primary); border-bottom:2px solid var(--signal); cursor:pointer; font-family:inherit;">My
+          Profile</button>
+        <button class="tab-btn" id="tabBtnOrders" onclick="switchDashboardTab('orders')"
+          style="background:none; border:none; padding:16px 0; font-size:14px; font-weight:500; color:var(--text-secondary); cursor:pointer; font-family:inherit;">My
+          Orders &amp; Tracking</button>
+      </div>
+
+      <!-- Scrollable Content Area -->
+      <div style="flex:1; overflow-y:auto; padding:32px; min-height:300px; background:var(--bg-surface);">
+        <!-- PROFILE TAB -->
+        <div id="dashTabProfile">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h4 style="font-size:15px; margin:0; font-weight:600; text-align:left;">Personal Information</h4>
+            <button class="btn btn-ghost btn-sm" id="editProfileBtn" onclick="toggleEditProfile()">Edit Profile</button>
+          </div>
+
+          <!-- View Mode -->
+          <div id="profileViewMode"
+            style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:24px; text-align:left;">
+            <div>
+              <div
+                style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono); text-transform:uppercase;">
+                Full Name</div>
+              <div style="font-size:14px; font-weight:600; margin-top:4px;" id="valName">Name</div>
+            </div>
+            <div>
+              <div
+                style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono); text-transform:uppercase;">
+                Phone Number</div>
+              <div style="font-size:14px; font-weight:600; margin-top:4px;" id="valPhone">Phone</div>
+            </div>
+            <div>
+              <div
+                style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono); text-transform:uppercase;">
+                Department</div>
+              <div style="font-size:14px; font-weight:600; margin-top:4px;" id="valDept">Department</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <div
+                style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono); text-transform:uppercase;">
+                Address</div>
+              <div
+                style="font-size:14px; font-weight:600; margin-top:4px; padding:12px; background:var(--bg-deep); border-radius:6px; white-space:pre-line;"
+                id="valAddress">Address</div>
+            </div>
+          </div>
+
+          <!-- Edit Mode Form -->
+          <form id="profileEditMode" onsubmit="event.preventDefault(); saveUserProfile();"
+            style="display:none; flex-direction:column; gap:16px; text-align:left;">
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:16px;">
+              <div>
+                <label for="inputName" style="font-size:12px; font-weight:600; display:block; margin-bottom:6px;">Full
+                  Name</label>
+                <input class="dim-input" type="text" id="inputName" required
+                  style="width:100%; padding:10px 12px; border:1px solid var(--border-color); border-radius:var(--r-sm); background:rgba(0,0,0,0.01); outline:none;">
+              </div>
+              <div>
+                <label for="inputPhone" style="font-size:12px; font-weight:600; display:block; margin-bottom:6px;">Phone
+                  Number</label>
+                <input class="dim-input" type="tel" id="inputPhone" required
+                  style="width:100%; padding:10px 12px; border:1px solid var(--border-color); border-radius:var(--r-sm); background:rgba(0,0,0,0.01); outline:none;">
+              </div>
+              <div>
+                <label for="inputDept"
+                  style="font-size:12px; font-weight:600; display:block; margin-bottom:6px;">Department</label>
+                <input class="dim-input" type="text" id="inputDept" required
+                  style="width:100%; padding:10px 12px; border:1px solid var(--border-color); border-radius:var(--r-sm); background:rgba(0,0,0,0.01); outline:none;">
+              </div>
+            </div>
+            <div>
+              <label for="inputAddress"
+                style="font-size:12px; font-weight:600; display:block; margin-bottom:6px;">Address</label>
+              <textarea rows="3" id="inputAddress" required
+                style="width:100%; padding:10px 12px; border:1px solid var(--border-color); border-radius:var(--r-sm); background:rgba(0,0,0,0.01); resize:none; font-family:inherit; outline:none;"></textarea>
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:8px;">
+              <button type="button" class="btn btn-ghost btn-sm" onclick="toggleEditProfile()">Cancel</button>
+              <button type="submit" class="btn btn-accent btn-sm">Save Changes</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- ORDERS TAB -->
+        <div id="dashTabOrders" style="display:none; text-align:left;">
+          <div id="dashOrdersContainer"
+            style="display:flex; flex-direction:column; gap:20px; max-height:45vh; overflow-y:auto; padding-right:8px;">
+            <!-- Dynamically rendered orders list with progress trackers -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div
+        style="display:flex; justify-content:flex-end; padding:16px 32px; border-top:1px solid var(--border-color); background:var(--bg-deep);">
+        <button class="btn btn-ghost btn-sm" onclick="closeUserDashboard()">Close Dashboard</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Order Detail Modal -->
+  <div id="userOrderDetailsModal" class="fullscreen-viewer-modal"
+    style="display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.6); z-index:2100;">
+    <div class="auth-card"
+      style="width:100%; max-width:480px; margin:20px; padding:32px; background:var(--bg-surface); border-radius:var(--r-lg); box-shadow:var(--shadow-premium);">
+      <h3 style="margin-bottom:8px; font-size:20px;">Order Details</h3>
+      <div style="font-size:12px; color:var(--text-muted); font-family:var(--font-mono); margin-bottom:16px;"
+        id="uOrderRefVal">Reference: —</div>
+
+      <div
+        style="font-size:13.5px; line-height:1.6; color:var(--text-primary); display:flex; flex-direction:column; gap:10px;">
+        <div
+          style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-color); padding-bottom:6px;">
+          <span>Material:</span> <strong id="uOrderMaterial">—</strong>
+        </div>
+        <div
+          style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-color); padding-bottom:6px;">
+          <span>Quantity:</span> <strong id="uOrderQty">—</strong>
+        </div>
+        <div
+          style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-color); padding-bottom:6px;">
+          <span>Pricing:</span> <strong id="uOrderTotal">—</strong>
+        </div>
+        <div
+          style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-color); padding-bottom:6px;">
+          <span>Submitted Date:</span> <strong id="uOrderDate">—</strong>
+        </div>
+        <div
+          style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-color); padding-bottom:6px;">
+          <span>Order Status:</span> <strong id="uOrderStatus" style="color:var(--signal);">—</strong>
+        </div>
+        <div
+          style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-color); padding-bottom:6px;">
+          <span>Model File Name:</span> <strong id="uOrderModelName">—</strong>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; margin-top:24px;">
+          <button class="btn btn-accent btn-sm" onclick="closeUserOrderDetailModal()">Close Details</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Terms of Fabrication Modal -->
+  <div id="termsModal" class="fullscreen-viewer-modal" onclick="if(event.target===this)closeTermsModal()"
+      style="display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.6); z-index:2200;">
+      <div class="card"
+        style="width:100%; max-width:600px; margin:20px; background:var(--bg-surface); border-radius:var(--r-lg); box-shadow:var(--shadow-premium); display:flex; flex-direction:column; max-height:85vh; border:none;">
+        <div
+          style="display:flex; justify-content:space-between; align-items:center; padding:20px 28px; border-bottom:1px solid var(--border-color);">
+          <h3 style="font-size:18px; margin:0;">Terms of Fabrication</h3>
+          <button class="icon-btn" onclick="closeTermsModal()" aria-label="Close Terms modal">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div
+          style="flex:1; overflow-y:auto; padding:24px 28px; font-size:13.5px; line-height:1.6; color:var(--text-secondary);">
+          <h4 style="color:var(--text-primary); margin-bottom:8px; font-size:14.5px;">1. Intellectual Property &amp;
+            File Rights</h4>
+          <p style="margin-bottom:16px;">You retain full ownership of all 3D models and CAD data uploaded to Stratum. We
+            only process and slice your files for the express purpose of estimating and manufacturing your order.</p>
+
+          <h4 style="color:var(--text-primary); margin-bottom:8px; font-size:14.5px;">2. Printability &amp; Geometric
+            Tolerances</h4>
+          <p style="margin-bottom:16px;">Additive manufacturing inherently features layer line textures and thermal
+            contraction variances (±0.2mm standard FDM tolerance). Thin features under 0.8mm or steep un-supported
+            overhangs may require customer iteration.</p>
+
+          <h4 style="color:var(--text-primary); margin-bottom:8px; font-size:14.5px;">3. Workshop Inspection &amp;
+            Pickup</h4>
+          <p style="margin-bottom:16px;">Orders are completed at the SET Nagaland University workshop. Parts are
+            inspected against specifications prior to notification. Users are requested to verify dimensions upon
+            handover.</p>
+
+          <h4 style="color:var(--text-primary); margin-bottom:8px; font-size:14.5px;">4. Academic &amp; Research
+            Prototype Policy</h4>
+          <p>Stratum prioritizes student engineering projects, faculty prototyping, and verified fabrication requests
+            with subsidized material recovery rates.</p>
+        </div>
+        <div
+          style="display:flex; justify-content:flex-end; padding:16px 28px; border-top:1px solid var(--border-color); background:var(--bg-deep);">
+          <button class="btn btn-accent btn-sm" onclick="closeTermsModal()">Understood</button>
+        </div>
+      </div>
+    </div>
+
+  <!-- Privacy & File Policy Modal -->
+  <div id="privacyModal" class="fullscreen-viewer-modal" onclick="if(event.target===this)closePrivacyModal()"
+    style="display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.6); z-index:2200;">
+      <div class="card"
+        style="width:100%; max-width:600px; margin:20px; background:var(--bg-surface); border-radius:var(--r-lg); box-shadow:var(--shadow-premium); display:flex; flex-direction:column; max-height:85vh; border:none;">
+        <div
+          style="display:flex; justify-content:space-between; align-items:center; padding:20px 28px; border-bottom:1px solid var(--border-color);">
+          <h3 style="font-size:18px; margin:0;">Privacy &amp; File Retention Policy</h3>
+          <button class="icon-btn" onclick="closePrivacyModal()" aria-label="Close Privacy modal">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div
+          style="flex:1; overflow-y:auto; padding:24px 28px; font-size:13.5px; line-height:1.6; color:var(--text-secondary);">
+          <h4 style="color:var(--text-primary); margin-bottom:8px; font-size:14.5px;">1. Data Collection</h4>
+          <p style="margin-bottom:16px;">We collect basic contact information (name, phone number, academic department)
+            and your uploaded STL files solely to coordinate fabrication and provide live order tracking updates.</p>
+
+          <h4 style="color:var(--text-primary); margin-bottom:8px; font-size:14.5px;">2. Model Storage &amp;
+            Confidentiality</h4>
+          <p style="margin-bottom:16px;">Model files are stored securely in Google Cloud Storage / Firebase with
+            authenticated access controls. Your design files are never shared with external parties or commercial third
+            parties.</p>
+
+          <h4 style="color:var(--text-primary); margin-bottom:8px; font-size:14.5px;">3. Account Security</h4>
+          <p>Authentication credentials are encrypted using Firebase Auth standards. Users can delete or request
+            deletion of their order history and stored mesh files upon order completion.</p>
+        </div>
+        <div
+          style="display:flex; justify-content:flex-end; padding:16px 28px; border-top:1px solid var(--border-color); background:var(--bg-deep);">
+          <button class="btn btn-accent btn-sm" onclick="closePrivacyModal()">I Agree</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Firebase Compat SDK Modules -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="firebase-config.js"></script>
+
+    <script src="stratum.js"></script>
+</body>
+
+</html>

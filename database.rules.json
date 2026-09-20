@@ -1,0 +1,29 @@
+{
+  "rules": {
+    "stratum-db": {
+      "users": {
+        "$uid": {
+          ".read": "auth != null && auth.uid == $uid",
+          ".write": "auth != null && auth.uid == $uid"
+        }
+      },
+      "admin_emails": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      },
+      "init_flag": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      },
+      "orders": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        ".indexOn": ["customer"]
+      },
+      "config": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    }
+  }
+}

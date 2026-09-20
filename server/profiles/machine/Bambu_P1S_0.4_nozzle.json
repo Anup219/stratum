@@ -1,0 +1,25 @@
+{
+  "type": "machine",
+  "name": "Bambu Lab P1S 0.4 nozzle",
+  "inherits": "fdm_bambu_common",
+  "from": "system",
+  "instantiation": "true",
+  "printer_model": "Bambu Lab P1S",
+  "nozzle_diameter": ["0.4"],
+  "printable_area": [
+    "0x0",
+    "256x0",
+    "256x256",
+    "0x256"
+  ],
+  "printable_height": "256",
+  "max_layer_height": ["0.30"],
+  "min_layer_height": ["0.08"],
+  "retraction_length": ["0.8"],
+  "retraction_speed": ["30"],
+  "deretraction_speed": ["30"],
+  "z_hop": ["0.4"],
+  "max_print_speed": "500",
+  "max_acceleration": "10000",
+  "gcode_flavor": "bambu"
+}

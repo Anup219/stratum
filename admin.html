@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Stratum Admin — Operations Console</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0f1013">
+<link rel="canonical" href="https://stratum-set.web.app/admin">
+<link rel="icon" type="image/svg+xml" href="assets/Black and White Letter S Logo_20260920_110202_0000.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- GSAP overlay animations -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<!-- Page/View Transition Overlay -->
+<div id="view-transition-overlay" class="view-transition-overlay">
+  <div class="transition-bar"></div>
+  <div class="transition-bar"></div>
+  <div class="transition-bar"></div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- Auth gate: hide admin content until Firebase verifies admin status -->
+<style>#view-admin { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; } #view-admin.auth-verified { opacity: 1; pointer-events: auto; }</style>
+
+<div id="view-admin">
+  <!-- Off-Canvas Drawer Backdrop -->
+  <div class="drawer-backdrop" id="adminDrawerBackdrop" onclick="closeAdminDrawer()"></div>
+
+  <aside class="sidebar" id="adminSidebar">
+    <div class="drawer-header">
+      <a href="stratum.html" class="logo" style="text-decoration:none;"><img src="assets/Black and White Letter S Logo_20260920_110202_0000.svg" alt="Stratum Logo" class="brand-logo"><span>Stratum</span><span class="dot">.</span></a>
+      <button type="button" class="drawer-close-btn" onclick="closeAdminDrawer()" aria-label="Close navigation">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <nav class="side-nav">
+      <button class="side-nav-btn active" data-page="orders" onclick="showAdminPage('orders')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+        Orders
+      </button>
+      <button class="side-nav-btn" data-page="pricing" onclick="showAdminPage('pricing')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        Pricing &amp; Billing
+      </button>
+      <button class="side-nav-btn" data-page="admins" onclick="showAdminPage('admins')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        Admins
+      </button>
+    </nav>
+    <div class="side-foot">
+      <a class="back-link" href="stratum.html">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to site
+      </a>
+      <a class="back-link" href="#" onclick="logoutAdmin()" style="color:#d32f2f; background: rgba(211, 47, 47, 0.03);">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        Sign out
+      </a>
+    </div>
+  </aside>
+
+  <div class="admin-main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button type="button" class="drawer-toggle-btn" id="drawerToggleBtn" onclick="toggleAdminDrawer()" aria-label="Open menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <div class="topbar-titles">
+          <h2 id="adminTitle">Orders</h2>
+          <div class="sub" id="adminSub">Every job currently in the system</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="search-box" id="orderSearchWrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9a9ab0" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input type="text" id="orderSearch" placeholder="Search orders or customer…">
+        </div>
+        <div class="admin-profile-badge">
+          <div class="avatar" id="adminAvatar" style="width:32px; height:32px; border-radius:50%; background:var(--signal); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:12px; font-weight:600; color:#fff;">AM</div>
+          <span id="adminNameBadge" style="font-size:13.5px; font-weight:600; color:var(--text-primary);">Admin</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ORDERS PAGE -->
+    <section class="admin-page" id="page-orders">
+      <div class="filter-row" id="statusFilters"></div>
+      <div class="panel-card" style="padding:0; overflow:hidden;">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Order</th><th>Customer</th><th>Material</th><th>Model File</th><th>Qty</th><th>Total</th><th>Status</th><th>Date</th></tr></thead>
+            <tbody id="ordersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRICING & BILLING PAGE -->
+    <section class="admin-page" id="page-pricing" hidden>
+
+      <!-- BILLING DETERMINATION CONTROLS -->
+      <div class="panel-card">
+        <h3>Billing determination rules</h3>
+        <div class="hint">Adjust flat setup fees, volume calculations, and bulk discount logic.</div>
+        <div class="billing-grid">
+          <div class="billing-field">
+            <label for="baseFeeInput">Base Setup &amp; QA Fee (₹)</label>
+            <input class="admin-input" type="number" id="baseFeeInput" value="0" step="10" style="max-width: 140px;">
+          </div>
+          <div class="billing-field">
+            <label for="p1sHourlyRateInput">Bambu P1S Machine Rate (₹ / hr)</label>
+            <input class="admin-input" type="number" id="p1sHourlyRateInput" value="0" step="5" style="max-width: 140px;">
+          </div>
+          <div class="billing-field">
+            <label for="wasteFactorInput">Waste Factor (1.05 – 1.15)</label>
+            <input class="admin-input" type="number" id="wasteFactorInput" value="1.10" step="0.01" min="1.0" max="1.5" style="max-width: 140px;">
+          </div>
+          <div class="billing-field">
+            <label for="failureRatePctInput">Failure Buffer (%)</label>
+            <input class="admin-input" type="number" id="failureRatePctInput" value="8" step="1" min="0" max="50" style="max-width: 140px;">
+          </div>
+          <div class="billing-field">
+            <label for="marginPctInput">Profit Margin (%)</label>
+            <input class="admin-input" type="number" id="marginPctInput" value="0" step="1" min="0" max="100" style="max-width: 140px;">
+          </div>
+          <div class="billing-field">
+            <label for="minimumOrderFeeInput">Minimum Order Fee (₹)</label>
+            <input class="admin-input" type="number" id="minimumOrderFeeInput" value="20" step="5" style="max-width: 140px;">
+          </div>
+          <div class="billing-field">
+            <label>Support Removal Surcharges (₹)</label>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <span style="font-size:12px;">5–15% support: ₹</span>
+              <input class="admin-input" type="number" id="supportTierMidInput" value="0" style="max-width: 70px; padding: 6px;">
+            </div>
+            <div style="display:flex; gap:8px; align-items:center; margin-top:6px;">
+              <span style="font-size:12px;">&gt;15% support: ₹</span>
+              <input class="admin-input" type="number" id="supportTierHighInput" value="0" style="max-width: 70px; padding: 6px;">
+            </div>
+          </div>
+          <div class="billing-field">
+            <label>Multi-Color Printing (Bambu AMS)</label>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <button class="toggle on" id="multiColorToggle" onclick="toggleMultiColorSurcharge()"><span class="knob"></span></button>
+              <span id="multiColorStatusText" style="font-size:12px; font-weight:600; color:var(--signal);">Enabled (+₹5)</span>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center; margin-top:8px;">
+              <span style="font-size:12px;">Surcharge: ₹</span>
+              <input class="admin-input" type="number" id="multiColorFeeInput" value="5" min="0" step="1" style="max-width: 70px; padding: 6px;">
+            </div>
+            <div class="hint" style="font-size:11px; margin-top:4px;">When disabled, customers can only select single-color prints. When enabled, applies surcharge for 2+ colors.</div>
+          </div>
+          <div class="billing-field">
+            <label>Bulk Discount Tiers (Min Qty &amp; %)</label>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <span style="font-size:12px;">Qty &ge;</span>
+              <input class="admin-input" type="number" id="tier1MinQtyInput" value="5" style="max-width: 60px; padding: 6px;">
+              <span style="font-size:12px;">gets</span>
+              <input class="admin-input" type="number" id="tier1DiscountInput" value="10" style="max-width: 60px; padding: 6px;">
+              <span style="font-size:12px;">%</span>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center; margin-top:8px;">
+              <span style="font-size:12px;">Qty &ge;</span>
+              <input class="admin-input" type="number" id="tier2MinQtyInput" value="10" style="max-width: 60px; padding: 6px;">
+              <span style="font-size:12px;">gets</span>
+              <input class="admin-input" type="number" id="tier2DiscountInput" value="15" style="max-width: 60px; padding: 6px;">
+              <span style="font-size:12px;">%</span>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 20px; display: flex; align-items: center; gap: 12px;">
+          <button class="btn btn-accent btn-sm" onclick="saveBillingControls()">Save Billing Rules</button>
+          <span class="saved-flag" id="billingRulesSaved">✓ Saved</span>
+        </div>
+      </div>
+
+      <div class="panel-card">
+        <h3>Material pricing</h3>
+        <div class="hint">Edit price (₹ / gram), density, and availability. Changes update calculations instantly.</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Color</th><th>Material</th><th>₹ / gram</th><th>Density g/cm³</th><th>Active</th><th></th></tr></thead>
+            <tbody id="materialsBody"></tbody>
+          </table>
+        </div>
+        <button class="btn btn-ghost btn-sm add-row-btn" onclick="addMaterial()">+ Add material</button>
+      </div>
+
+      <div class="panel-card">
+        <h3>Filament Spool Colors (Primary &amp; AMS)</h3>
+        <div class="hint">Manage available filament spool colors for single-color and Bambu AMS multi-color prints. Add new colors, update hex codes, and toggle availability.</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th style="width:60px;">Color</th><th>Color Name</th><th>Hex Code</th><th>Active</th><th></th></tr></thead>
+            <tbody id="spoolColorsBody"></tbody>
+          </table>
+        </div>
+        <button class="btn btn-ghost btn-sm add-row-btn" onclick="addSpoolColor()">+ Add spool color</button>
+      </div>
+
+      <div class="panel-card">
+        <h3>Quality presets</h3>
+        <div class="hint">Print speed controls machine time; speed value in cm³/hr.</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Preset</th><th>Speed cm³/hr</th><th>Layer Preset</th></tr></thead>
+            <tbody id="qualityBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ADMINS PAGE -->
+    <section class="admin-page" id="page-admins" hidden>
+      <div class="panel-card">
+        <h3>User Access Control</h3>
+        <div class="hint">Grant administrative privileges to users by email address. Promoted users can log in as admins.</div>
+        <div class="grant-admin-form" style="display:flex; gap:12px; align-items:center; max-width:500px; margin-bottom: 24px; flex-wrap: wrap;">
+          <input type="email" id="newAdminEmail" class="admin-input" placeholder="e.g. staff@stratum.com" style="max-width:none; flex:1; min-width: 200px;">
+          <button class="btn btn-accent btn-sm" onclick="grantAdminAccess()">Grant Admin Access</button>
+        </div>
+        <div>
+          <h4 style="font-size:13px; margin:0 0 10px; color:var(--text-primary);">Current Administrators</h4>
+          <ul id="adminEmailsList" style="list-style:none; padding:0; margin:0; font-family:var(--font-mono); font-size:13px; display:flex; flex-direction:column; gap:8px; max-width: 500px;">
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+
+
+<!-- Firebase Compat SDK Modules -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+<script src="firebase-config.js"></script>
+
+<script src="admin.js"></script>
+</body>
+</html>

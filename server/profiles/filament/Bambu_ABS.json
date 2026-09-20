@@ -1,0 +1,17 @@
+{
+  "type": "filament",
+  "name": "Bambu ABS @BBL P1S",
+  "inherits": "fdm_filament_abs",
+  "filament_type": ["ABS"],
+  "filament_density": ["1.04"],
+  "filament_cost": ["26"],
+  "nozzle_temperature": ["270"],
+  "nozzle_temperature_initial_layer": ["270"],
+  "hot_plate_temp": ["90"],
+  "hot_plate_temp_initial_layer": ["90"],
+  "fan_cooling_layer_time": ["30"],
+  "fan_min_speed": ["10"],
+  "fan_max_speed": ["20"],
+  "filament_flow_ratio": ["0.96"],
+  "filament_max_volumetric_speed": ["18"]
+}

@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin.html
+Disallow: /server/
+Disallow: /api/
+
+Sitemap: https://stratum-set.web.app/sitemap.xml

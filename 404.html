@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Layer Shift Detected — 404 Not Found | Stratum</title>
+<meta name="robots" content="noindex, follow">
+<meta name="description" content="The requested page could not be found — Stratum 3D Print Studio.">
+<meta name="theme-color" content="#0f1013">
+<link rel="icon" type="image/svg+xml" href="assets/Black and White Letter S Logo_20260920_110202_0000.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+<!-- GSAP for smooth entrance reveals -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<style>
+  :root {
+    --bg-base: #0f1013;
+    --accent: #ff5200;
+    --accent-glow: rgba(255, 82, 0, 0.15);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --text-primary: #f4f6f8;
+    --text-muted: #9a9ab0;
+    --font-mono: 'IBM Plex Mono', monospace;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+    position: relative;
+    padding: 24px;
+  }
+
+  /* Tech Grid Background */
+  body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      linear-gradient(rgba(255, 82, 0, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 82, 0, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: center center;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* Radial Ambient Glow */
+  .ambient-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .content-wrap {
+    position: relative;
+    z-index: 3;
+    max-width: 580px;
+    text-align: center;
+    padding: 40px 24px 20px;
+  }
+
+  .brand-header {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 32px;
+    text-decoration: none;
+    color: var(--text-primary);
+  }
+
+  .brand-logo {
+    width: 32px;
+    height: 32px;
+    display: block;
+  }
+
+  .brand-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -0.5px;
+  }
+
+  .brand-name span {
+    color: var(--accent);
+  }
+
+  /* Corrupted 3D Print Preview Box (Layer Shifted) */
+  .corrupted-preview {
+    width: 180px;
+    height: 180px;
+    margin: 0 auto 36px;
+    position: relative;
+    perspective: 800px;
+  }
+
+  .shifted-box {
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    transform-style: preserve-3d;
+    transform: rotateX(60deg) rotateZ(45deg);
+    animation: rotateEngine 12s infinite linear;
+  }
+
+  .face {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border: 1px solid var(--accent);
+    background: rgba(255, 82, 0, 0.05);
+  }
+
+  /* Create cube faces */
+  .f-front  { transform: translateZ(50px); }
+  .f-back   { transform: rotateY(180deg) translateZ(50px); }
+  .f-left   { transform: rotateY(-90deg) translateZ(50px); }
+  .f-right  { transform: rotateY(90deg) translateZ(50px); }
+  .f-top    { transform: rotateX(90deg) translateZ(50px); }
+  .f-bottom { transform: rotateX(-90deg) translateZ(50px); }
+
+  /* Corrupted "Shifted" duplicate face layers */
+  .shifted-layer {
+    position: absolute;
+    width: 100px;
+    height: 30px;
+    border: 1px dashed #d32f2f;
+    background: rgba(211, 47, 47, 0.1);
+    transform: translateZ(20px) translateX(25px) translateY(-15px);
+  }
+
+  @keyframes rotateEngine {
+    0% { transform: rotateX(60deg) rotateZ(0deg); }
+    100% { transform: rotateX(60deg) rotateZ(360deg); }
+  }
+
+  .code-label {
+    font-family: var(--font-mono);
+    color: var(--accent);
+    font-size: 13px;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(255, 82, 0, 0.08);
+    border: 1px solid rgba(255, 82, 0, 0.2);
+    border-radius: 4px;
+  }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    letter-spacing: -1px;
+  }
+
+  p {
+    font-size: 16px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+
+  .btn-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: #fff;
+    border: 1px solid transparent;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 20px rgba(255, 82, 0, 0.25);
+    cursor: pointer;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(255, 82, 0, 0.4);
+    background: #ff6a20;
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+    box-shadow: none;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .footer-tag {
+    margin-top: 24px;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+</style>
+</head>
+<body>
+
+<div class="ambient-glow"></div>
+
+<div class="content-wrap" id="404-container">
+  <a href="stratum.html" class="brand-header reveal" aria-label="Stratum Homepage">
+    <img src="assets/Black and White Letter S Logo_20260920_110202_0000.svg" alt="Stratum Logo" class="brand-logo">
+    <span class="brand-name">Stratum<span>.</span></span>
+  </a>
+
+  <div class="corrupted-preview reveal">
+    <div class="shifted-box">
+      <div class="face f-front"></div>
+      <div class="face f-back"></div>
+      <div class="face f-left"></div>
+      <div class="face f-right"></div>
+      <div class="face f-top"></div>
+      <div class="face f-bottom"></div>
+      <!-- Shifted printing layers -->
+      <div class="shifted-layer"></div>
+    </div>
+  </div>
+
+  <span class="code-label reveal">ERROR // 404_SHIFT_DETECTED</span>
+  <h1 class="reveal" id="error-title">Print Bed Collision</h1>
+  <p class="reveal">The model file or page resource you requested has warped off the build plate or suffered an unrecoverable layer shift.</p>
+  
+  <div class="btn-group reveal">
+    <a href="stratum.html" class="btn" id="404-home-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Return to Configurator
+    </a>
+    <a href="login.html" class="btn btn-secondary">
+      Sign In / Track Orders
+    </a>
+  </div>
+
+  <div class="footer-tag reveal">
+    Stratum Fabrication by SET Nagaland University
+  </div>
+</div>
+
+<script>
+  // Smooth entrance reveals
+  gsap.fromTo(".reveal", 
+    { opacity: 0, y: 24 }, 
+    { opacity: 1, y: 0, duration: 0.7, stagger: 0.12, ease: "power3.out" }
+  );
+</script>
+</body>
+</html>
+

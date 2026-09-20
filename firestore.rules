@@ -1,0 +1,48 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Check if user is logged in
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Check if user matches email
+    function isOwner(email) {
+      return isAuthenticated() && request.auth.token.email.lower() == email.lower();
+    }
+    
+    // Check if request is from an admin
+    function isAdmin() {
+      return isAuthenticated() && 
+        (request.auth.token.email.lower() == 'anupchowdhury219@gmail.com' || 
+         exists(/databases/$(database)/documents/admins/$(request.auth.token.email.lower())) ||
+         !exists(/databases/$(database)/documents/admins/init));
+    }
+
+    // Material definitions can be read by anyone, but only written by admins
+    match /materials/{materialId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Pricing parameters can be read by anyone, but only written by admins
+    match /pricing/{configId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Orders rules: Users can read/write their own orders. Admins can read/write all orders.
+    match /orders/{orderId} {
+      allow create: if isAuthenticated();
+      allow read, update: if isAdmin() || isOwner(resource.data.customer);
+      allow delete: if isAdmin();
+    }
+    
+    // Admin list registry
+    match /admins/{email} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "filament",
+  "name": "Bambu PLA Basic @BBL P1S",
+  "inherits": "fdm_filament_pla",
+  "filament_type": ["PLA"],
+  "filament_density": ["1.24"],
+  "filament_cost": ["25"],
+  "nozzle_temperature": ["220"],
+  "nozzle_temperature_initial_layer": ["220"],
+  "hot_plate_temp": ["55"],
+  "hot_plate_temp_initial_layer": ["55"],
+  "fan_cooling_layer_time": ["100"],
+  "fan_min_speed": ["100"],
+  "fan_max_speed": ["100"],
+  "filament_flow_ratio": ["0.98"],
+  "filament_max_volumetric_speed": ["21"]
+}
