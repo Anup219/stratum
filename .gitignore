@@ -64,6 +64,27 @@ node_modules/
 
 # dotenv environment variables file
 .env
+.env.*
+!.env.example
+
+# Service account credentials & secrets
+*serviceAccountKey*.json
+*service-account*.json
+*.pem
+*.key
+
+# Slicer intermediate / temporary outputs
+*.gcode
+*.3mf
+
+# OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
 
 # dataconnect generated files
 .dataconnect
+
+# Firebase client config (contains active project keys)
+firebase-config.js
+!firebase-config.example.js

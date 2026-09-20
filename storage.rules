@@ -2,11 +2,12 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
     match /models/{orderId}/{fileName} {
-      // Allow read access for viewing models
-      allow read: if true;
+      // Allow authenticated users to view/download models
+      allow read: if request.auth != null;
       
-      // Enforce file size limit (50MB) and file extension constraints for security
-      allow write: if request.resource.size < 50 * 1024 * 1024
+      // Enforce authentication, 50MB file size limit, and STL/OBJ extensions
+      allow write: if request.auth != null
+                   && request.resource.size < 50 * 1024 * 1024
                    && (fileName.toLowerCase().endsWith('.stl') || fileName.toLowerCase().endsWith('.obj'));
     }
   }

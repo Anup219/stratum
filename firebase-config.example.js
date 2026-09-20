@@ -1,31 +1,31 @@
 /* ============================================================
-   FIREBASE CONFIGURATION
+   FIREBASE CONFIGURATION TEMPLATE
    ============================================================
    INSTRUCTIONS:
-   1. Go to https://console.firebase.google.com
-   2. Select your project → Project Settings (gear icon)
-   3. Scroll to "Your apps" → click your web app (or add one)
-   4. Copy the firebaseConfig object values below
+   1. Copy this file to `firebase-config.js`
+   2. Go to https://console.firebase.google.com
+   3. Select your project → Project Settings (gear icon)
+   4. Scroll to "Your apps" → click your web app (or add one)
+   5. Fill in the values below with your credentials
    ============================================================ */
 
-
 const firebaseConfig = {
-  apiKey: "AIzaSyAnAhZz8FNExu35jqU3EImBdLTQ0ZCYEu4",
-  authDomain: "stratum-set.firebaseapp.com",
-  databaseURL: "https://stratum-set-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "stratum-set",
-  storageBucket: "stratum-set.firebasestorage.app",
-  messagingSenderId: "970198506960",
-  appId: "1:970198506960:web:35847d739b459c18b1edd5",
-  measurementId: "G-V4YG5FDXYG"
+  apiKey: "YOUR_API_KEY_HERE",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID",
+  measurementId: "YOUR_MEASUREMENT_ID"
 };
 
 firebase.initializeApp(firebaseConfig);
 
 /* Shared Firebase service handles used across all pages */
-const rtdb = firebase.database();   // Realtime Database
+const rtdb = firebase.database();        // Realtime Database
 const fbStorage = firebase.storage();    // Cloud Storage for models
-const auth = firebase.auth();        // Firebase Authentication
+const auth = firebase.auth();            // Firebase Authentication
 
 /* ============================================================
    KEY HELPERS

@@ -9,11 +9,11 @@
       },
       "admin_emails": {
         ".read": "auth != null",
-        ".write": "auth != null"
+        ".write": "auth != null && auth.token.email == 'anupchowdhury219@gmail.com'"
       },
       "init_flag": {
         ".read": "auth != null",
-        ".write": "auth != null"
+        ".write": "auth != null && auth.token.email == 'anupchowdhury219@gmail.com'"
       },
       "orders": {
         ".read": "auth != null",
@@ -22,7 +22,7 @@
       },
       "config": {
         ".read": "auth != null",
-        ".write": "auth != null"
+        ".write": "auth != null && (auth.token.email == 'anupchowdhury219@gmail.com' || root.child('stratum-db/admin_emails/0').val() == auth.token.email || root.child('stratum-db/admin_emails/1').val() == auth.token.email || root.child('stratum-db/admin_emails/2').val() == auth.token.email || root.child('stratum-db/admin_emails/3').val() == auth.token.email || root.child('stratum-db/admin_emails/4').val() == auth.token.email)"
       }
     }
   }
